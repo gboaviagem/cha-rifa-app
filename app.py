@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
 import os
+import pymongo
+
+# Initialize connection.
+client = pymongo.MongoClient(**st.secrets["mongo"])
 
 st.title('Chá Rifa da Gianna!')
 
@@ -11,24 +15,14 @@ st.markdown(
     "cha.rifa.da.gianna/)**.")
 
 def read_picked_numbers():
-    df = pd.read_csv(
-        os.getcwd() + "/resources/picked_numbers.csv")
-    return df['PICKED_NUMBER'].tolist()
+    db = client.test
+    items = db.my_collection.find()
+    items = list(items)  # make hashable for st.cache
+    return [item['PICKED_NUMBER'] for item in items]
 
 def write_new_number(name, num):
-    df = pd.read_csv(
-        os.getcwd() + "/resources/picked_numbers.csv")
-    all_nums = df['PICKED_NUMBER'].tolist()
-    all_names = df['NAME'].tolist()
-    num_list = all_nums + [num]
-    name_list = all_names + [name]
-    new_df = pd.DataFrame({
-        'NAME': name_list,
-        'PICKED_NUMBER': num_list
-    })
-    new_df.to_csv(
-        os.getcwd() + "/resources/picked_numbers.csv",
-        index=False)
+    db = client.test
+    db.my_collection.insert_one({"NAME": name, "PICKED_NUMBER": num})
 
 def remaining_numbers():
     TOTAL_NUMBERS = 150
