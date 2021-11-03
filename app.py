@@ -46,13 +46,20 @@ if len(name) > 0:
     if option != "Nenhum":
         if st.button('Confirmar'):
             write_new_number(name, int(option))
-            st.subheader(
+            st.markdown(
                 "**Muito obrigado!** Papai e mamãe ficam super gratos "
                 "pela ajuda com minhas fraldinhas. Para concluir a "
-                "reserva da rifa, você pode transferir os R$20 para a "
-                "conta descrita na nossa **[página no Instagram]"
-                "(https://www.instagram.com/cha.rifa.da.gianna/)**. "
-                "\n\n Para escolher um novo valor, por favor "
+                "reserva da rifa, você pode **transferir os R$20 para "
+                "o seguinte PIX**, no nome de **Bárbara Ferraz "
+                "Gominho Boaviagem**:")
+
+            st.subheader("(81)997893237")
+
+            st.markdown(
+                "*(O PIX é esse número de celular mesmo)*")
+
+            st.markdown(
+                "Para escolher um novo valor, por favor "
                 "**recarregue** a página.")
         else:
             st.markdown("Clique em *Confirmar* para reservar este número.")
