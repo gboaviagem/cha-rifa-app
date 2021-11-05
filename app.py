@@ -10,8 +10,8 @@ st.title('Chá Rifa da Gianna!')
 
 st.markdown(
     "Olá! Obrigado por querer contribuir com o Chá Rifa de nossa pequena. "
-    "Caso queira conhecer mais a respeito, confira nossa "
-    "**[página no Instagram](https://www.instagram.com/"
+    "Para mais informações, acesse "
+    "**[nossa página no Instagram](https://www.instagram.com/"
     "cha.rifa.da.gianna/)**.")
 
 def read_picked_numbers():
@@ -30,16 +30,19 @@ def remaining_numbers():
         set(range(1, TOTAL_NUMBERS + 1)) -
         set(read_picked_numbers()))
 
-name = st.text_input('Nome')
+name = st.text_input(
+    "São só 2 passos! Primeiro, por favor digite seu nome, para "
+    "que possamos te identificar:")
 
 if len(name) > 0:
     vocativo = f"Olá, {name}!"
     st.subheader(
-        "{} Qual número você gostaria de pegar para a Rifa?".format(vocativo))
+        "{} Pronto, agora qual número você gostaria "
+        "de pegar para a Rifa?".format(vocativo))
 
     option = st.selectbox(
         f"Selecione um número dentre os {len(remaining_numbers())} "
-        "que não foram selecionados ainda",
+        "que não foram selecionados ainda.",
         tuple(["Nenhum"] + remaining_numbers()))
     st.write('Valor selecionado:', option)
 
@@ -62,4 +65,7 @@ if len(name) > 0:
                 "Para escolher um novo valor, por favor "
                 "**recarregue** a página.")
         else:
-            st.markdown("Clique em *Confirmar* para reservar este número.")
+            st.markdown(
+                "**Calma! Você pode voltar e escolher outro número, se "
+                "quiser. Sua escolha só vai se efetivar após clicar "
+                "em *Confirmar*.**")
