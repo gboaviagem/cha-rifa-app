@@ -30,15 +30,36 @@ def remaining_numbers():
         set(range(1, TOTAL_NUMBERS + 1)) -
         set(read_picked_numbers()))
 
+def nums_you_picked(your_name):
+    db = client.test
+    items = db.my_collection.find()
+    items = list(items)  # make hashable for st.cache
+    nums = [
+        item['PICKED_NUMBER'] for item in items
+        if item['NAME'].lower() == your_name.lower()]
+    return nums
+    
+
 name = st.text_input(
     "São só 2 passos! Primeiro, por favor digite seu nome, para "
     "que possamos te identificar:")
 
 if len(name) > 0:
     vocativo = f"Olá, {name}!"
-    st.subheader(
-        "{} Pronto, agora qual número você gostaria "
-        "de pegar para a Rifa?".format(vocativo))
+    you_picked = nums_you_picked(name)
+    if len(you_picked) > 0:
+        st.subheader(
+            "{} Você **já pegou** os números: **{}**. Se quiser "
+            "pegar ainda outros, prossiga "
+            "adiante.".format(
+                vocativo,
+                str(you_picked).replace("[", "").replace("]", "")
+                )
+            )
+    else:
+        st.subheader(
+            "{} Pronto, agora qual número você gostaria "
+            "de pegar para a Rifa?".format(vocativo))
 
     option = st.selectbox(
         f"Selecione um número dentre os {len(remaining_numbers())} "
