@@ -19,4 +19,5 @@ df = pd.DataFrame({
     'NAME': name_150,
     'PICKED_NUMBER': num_150
 })
-df.sort_values(by="PICKED_NUMBER").to_csv("picked_numbers.csv", index=False)
+df.sort_values(by="PICKED_NUMBER").to_csv(
+    "picked_numbers.csv", index=False, sep=";")
