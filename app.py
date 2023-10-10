@@ -3,34 +3,45 @@ import pandas as pd
 import os
 import pymongo
 
+st.set_page_config(
+    page_title="Chá Rifa da Isabela!",
+    page_icon="💖", layout="centered",
+    initial_sidebar_state="auto", menu_items=None)
+
+# Constants
+TOTAL_NUMBERS = 200
+
 # Initialize connection.
 client = pymongo.MongoClient(**st.secrets["mongo"])
 
-st.title('Chá Rifa da Gianna!')
+st.title("💖 Chá Rifa da Isabela!")
 
 st.markdown(
     "Olá! Obrigado por querer contribuir com o Chá Rifa de nossa pequena. "
     "Para mais informações, acesse "
     "**[nossa página no Instagram](https://www.instagram.com/"
-    "cha.rifa.da.gianna/)**.")
+    "cha.rifa.da.isabela/)**.")
 
 def read_picked_numbers():
+    """Fetch all documents from the database."""
     db = client.test
     items = db.my_collection.find()
     items = list(items)  # make hashable for st.cache
     return [item['PICKED_NUMBER'] for item in items]
 
 def write_new_number(name, num):
+    """Write a new document to the database."""
     db = client.test
     db.my_collection.insert_one({"NAME": name, "PICKED_NUMBER": num})
 
 def remaining_numbers():
-    TOTAL_NUMBERS = 150
+    """Return a list of numbers that have not been picked yet."""
     return list(
         set(range(1, TOTAL_NUMBERS + 1)) -
         set(read_picked_numbers()))
 
 def nums_you_picked(your_name):
+    """Return a list of numbers that you have already picked."""
     db = client.test
     items = db.my_collection.find()
     items = list(items)  # make hashable for st.cache
@@ -68,6 +79,10 @@ if len(name) > 0:
     st.write('Valor selecionado:', option)
 
     if option != "Nenhum":
+        st.markdown(
+            "**Calma! Você pode voltar e escolher outro número, se "
+            "quiser. Sua escolha só vai se efetivar após clicar "
+            "em *Confirmar*.**")
         if st.button('Confirmar'):
             write_new_number(name, int(option))
             st.markdown(
@@ -77,7 +92,7 @@ if len(name) > 0:
                 "o seguinte PIX**, no nome de **Bárbara Ferraz "
                 "Gominho Boaviagem**:")
 
-            st.subheader("(81)997893237")
+            st.subheader("81997893237")
 
             st.markdown(
                 "*(O PIX é esse número de celular mesmo)*")
@@ -85,8 +100,3 @@ if len(name) > 0:
             st.markdown(
                 "Para escolher um novo valor, por favor "
                 "**recarregue** a página.")
-        else:
-            st.markdown(
-                "**Calma! Você pode voltar e escolher outro número, se "
-                "quiser. Sua escolha só vai se efetivar após clicar "
-                "em *Confirmar*.**")
