@@ -1,18 +1,13 @@
 import streamlit as st
-import pandas as pd
-import os
-import pymongo
+from utils.db import MongoHandler
 
 st.set_page_config(
     page_title="Chá Rifa da Isabela!",
     page_icon="💖", layout="centered",
     initial_sidebar_state="auto", menu_items=None)
 
-# Constants
-TOTAL_NUMBERS = 200
-
 # Initialize connection.
-client = pymongo.MongoClient(**st.secrets["mongo"])
+db = MongoHandler()
 
 st.title("💖 Chá Rifa da Isabela!")
 
@@ -22,42 +17,13 @@ st.markdown(
     "**[nossa página no Instagram](https://www.instagram.com/"
     "cha.rifa.da.isabela/)**.")
 
-def read_picked_numbers():
-    """Fetch all documents from the database."""
-    db = client.test
-    items = db.my_collection.find()
-    items = list(items)  # make hashable for st.cache
-    return [item['PICKED_NUMBER'] for item in items]
-
-def write_new_number(name, num):
-    """Write a new document to the database."""
-    db = client.test
-    db.my_collection.insert_one({"NAME": name, "PICKED_NUMBER": num})
-
-def remaining_numbers():
-    """Return a list of numbers that have not been picked yet."""
-    return list(
-        set(range(1, TOTAL_NUMBERS + 1)) -
-        set(read_picked_numbers()))
-
-def nums_you_picked(your_name):
-    """Return a list of numbers that you have already picked."""
-    db = client.test
-    items = db.my_collection.find()
-    items = list(items)  # make hashable for st.cache
-    nums = [
-        item['PICKED_NUMBER'] for item in items
-        if item['NAME'].lower() == your_name.lower()]
-    return nums
-    
-
 name = st.text_input(
     "São só 2 passos! Primeiro, por favor digite seu nome, para "
     "que possamos te identificar:")
 
 if len(name) > 0:
     vocativo = f"Olá, {name}!"
-    you_picked = nums_you_picked(name)
+    you_picked = db.nums_you_picked(name)
     if len(you_picked) > 0:
         st.subheader(
             "{} Você **já pegou** os números: **{}**. Se quiser "
@@ -72,10 +38,11 @@ if len(name) > 0:
             "{} Pronto, agora qual número você gostaria "
             "de pegar para a Rifa?".format(vocativo))
 
+    remaining = db.remaining_numbers()
     option = st.selectbox(
-        f"Selecione um número dentre os {len(remaining_numbers())} "
+        f"Selecione um número dentre os {len(remaining)} "
         "que não foram selecionados ainda.",
-        tuple(["Nenhum"] + remaining_numbers()))
+        tuple(["Nenhum"] + remaining))
     st.write('Valor selecionado:', option)
 
     if option != "Nenhum":
@@ -84,7 +51,7 @@ if len(name) > 0:
             "quiser. Sua escolha só vai se efetivar após clicar "
             "em *Confirmar*.**")
         if st.button('Confirmar'):
-            write_new_number(name, int(option))
+            db.write_new_number(name, int(option))
             st.markdown(
                 "**Muito obrigado!** Papai e mamãe ficam super gratos "
                 "pela ajuda com minhas fraldinhas. Para concluir a "
